@@ -1,0 +1,6 @@
+SELECT 
+    AVG(amount) AS avg_deposit_amount
+FROM 
+    DepositData
+WHERE 
+    MONTH(datetime) = 10 AND YEAR(datetime) = 2022;
