@@ -1,0 +1,13 @@
+SELECT 
+    AVG(games_played) AS avg_games_per_user
+FROM (
+    SELECT 
+        User_Id, 
+        SUM(games_played) AS total_games_played
+    FROM 
+        AnalyticsPosition
+    WHERE 
+        MONTH(datetime) = 10 AND YEAR(datetime) = 2024
+    GROUP BY 
+        User_Id
+) AS user_game_totals;
