@@ -1,0 +1,56 @@
+Project Overview
+
+
+ABC is an online gaming platform where users play multiplayer games like Ludo. Users can deposit money, play games, and withdraw their winnings. To encourage player engagement, ABC awards loyalty points based on each player's activities on the platform, including deposits, withdrawals, and the number of games played. At the end of each month, the top 50 players with the highest loyalty points receive cash bonuses.
+
+This report details the process for calculating player loyalty points, ranking players, and distributing bonuses. We used SQL to analyze the data and answer specific questions about loyalty points and bonus allocation.
+
+Data Used:
+
+We worked with three tables:
+
+DepositData – Contains user_id, deposit_amount, and datetime of each deposit made by players.
+WithdrawalData – Contains user_id, withdrawal_amount, and datetime of each withdrawal by players.
+AnalyticsPosition – Contains user_id, number_of_games_played, and datetime of each gaming session.
+
+Loyalty Points Calculation Criteria
+Loyalty points are calculated using the following factors:
+
+Deposit Points: Each deposit earns points at a rate of 0.01 points per unit of currency deposited.
+Withdrawal Points: Each withdrawal costs 0.005 points per unit of currency withdrawn.
+Frequency of Deposits over Withdrawals: Players earn an additional 0.001 points for every deposit that exceeds the number of withdrawals.
+Games Played: Each game played earns 0.2 points.
+The formula for total loyalty points is:  Loyalty Points = (0.01 * Total Deposits) + (0.005 * Total Withdrawals) + (0.001 * max(#Deposits - #Withdrawals, 0)) + (0.2 * Total Games Played)
+Part A: Calculating Loyalty Points and Ranking Players
+1. Daily Loyalty Points by Slot
+Each day is split into two 12-hour slots:
+
+Slot S1: 12am to 12pm
+Slot S2: 12pm to 12am
+We calculated player-specific loyalty points for the following slots:
+
+October 2, Slot S1
+October 16, Slot S2
+October 18, Slot S1
+October 26, Slot S2
+This involved summing up deposit, withdrawal, and gaming data per player for each specified slot and applying the loyalty points formula.
+
+2. Monthly Loyalty Points and Ranking
+For the month of October:
+
+We calculated the total loyalty points for each player by summing up their daily points.
+Players were then ranked based on their total loyalty points.
+In the case of ties (players with the same loyalty points), we used the number of games played as a secondary criterion for ranking.
+
+3. Summary Statistics
+We also computed some basic metrics for October:
+
+Average Deposit Amount: The average amount deposited by all players.
+Average Deposit Per User: The average deposit amount per individual player.
+Average Number of Games Played: The average number of games played per user.
+Part B: Bonus Allocation for Top 50 Players
+ABC allocates a  top 50 players with the highest loyalty points for October. To determine how much each player should receive:
+
+We calculated the total loyalty points for the top 50 players.
+Each player’s bonus was proportional to their loyalty points relative to the total loyalty points of the top 50 players.
+This method ensures that players with higher loyalty points receive a larger share of the bonus.
