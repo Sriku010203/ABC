@@ -1,0 +1,30 @@
+SELECT 
+    a.User_Id,
+    DATE(a.datetime) AS date,
+    CASE 
+        WHEN TIME(a.datetime) < '12:00:00' THEN 'S1'
+        ELSE 'S2'
+    END AS slot,
+    COALESCE(0.01 * d.amount, 0) AS deposit_points,
+    COALESCE(0.005 * w.amount, 0) AS withdrawal_points,
+    COALESCE(0.001 * GREATEST(COUNT(d.User_Id) - COUNT(w.User_Id), 0), 0) as deposit_vs_withdrawal_points,
+    0.2 * SUM(a.games_played) AS games_points,
+    COALESCE(0.01 * d.amount, 0) + 
+    COALESCE(0.005 * w.amount, 0) + 
+    COALESCE(0.001 * GREATEST(COUNT(d.User_Id) - COUNT(w.User_Id), 0), 0) + 
+    (0.2 * SUM(a.games_played)) AS loyalty_points
+FROM 
+    AnalyticsPositionCaseStudy a
+LEFT JOIN 
+    DepositData d ON a.User_Id = d.User_Id AND DATE(a.datetime) = DATE(d.datetime) AND 
+    CASE WHEN TIME(d.datetime) < '12:00:00' THEN 'S1' ELSE 'S2' END = CASE WHEN TIME(a.datetime) < '12:00:00' THEN 'S1' ELSE 'S2' END
+LEFT JOIN 
+    WithdrawalData w ON a.User_Id = w.User_Id AND DATE(a.datetime) = DATE(w.datetime) AND 
+    CASE WHEN TIME(w.datetime) < '12:00:00' THEN 'S1' ELSE 'S2' END = CASE WHEN TIME(a.datetime) < '12:00:00' THEN 'S1' ELSE 'S2' END
+WHERE 
+    (DATE(a.datetime) = '2024-10-02' AND TIME(a.datetime) < '12:00:00') OR 
+    (DATE(a.datetime) = '2024-10-16' AND TIME(a.datetime) >= '12:00:00') OR 
+    (DATE(a.datetime) = '2024-10-18' AND TIME(a.datetime) < '12:00:00') OR 
+    (DATE(a.datetime) = '2024-10-26' AND TIME(a.datetime) >= '12:00:00')
+GROUP BY 
+    a.User_Id, DATE(a.datetime), slot;
