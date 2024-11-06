@@ -1,9 +1,9 @@
 SELECT 
-    AVG(deposit_total) AS avg_deposit_per_user
+    AVG(amount) AS avg_deposit_per_user
 FROM (
     SELECT 
         User_Id, 
-        SUM(deposit_amount) AS deposit_total
+        SUM(amount) AS deposit_total
     FROM 
         DepositData
     WHERE 
