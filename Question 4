@@ -1,0 +1,13 @@
+SELECT 
+    AVG(deposit_total) AS avg_deposit_per_user
+FROM (
+    SELECT 
+        User_Id, 
+        SUM(deposit_amount) AS deposit_total
+    FROM 
+        DepositData
+    WHERE 
+        MONTH(datetime) = 10 AND YEAR(datetime) = 2022
+    GROUP BY 
+        User_Id
+) AS user_deposit_totals;
