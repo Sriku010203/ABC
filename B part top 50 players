@@ -1,0 +1,31 @@
+WITH ranked_players AS (
+    SELECT 
+        a.User_Id,
+        SUM(COALESCE(0.01 * d.deposit_amount, 0)) + 
+        SUM(COALESCE(0.005 * w.withdrawal_amount, 0)) + 
+        COALESCE(0.001 * GREATEST(COUNT(d.User_Id) - COUNT(w.User_Id), 0), 0) + 
+        SUM(0.2 * a.games_played) AS total_loyalty_points,
+        RANK() OVER (ORDER BY 
+                     SUM(COALESCE(0.01 * d.deposit_amount, 0)) + 
+                     SUM(COALESCE(0.005 * w.withdrawal_amount, 0)) + 
+                     COALESCE(0.001 * GREATEST(COUNT(d.User_Id) - COUNT(w.User_Id), 0), 0) + 
+                     SUM(0.2 * a.games_played) DESC) AS rank
+    FROM 
+        AnalyticsPosition a
+    LEFT JOIN 
+        DepositData d ON a.User_Id = d.User_Id AND DATE(a.datetime) = DATE(d.datetime)
+    LEFT JOIN 
+        WithdrawalData w ON a.User_Id = w.User_Id AND DATE(a.datetime) = DATE(w.datetime)
+    WHERE 
+        MONTH(a.datetime) = 10 AND YEAR(a.datetime) = 2024
+    GROUP BY 
+        a.User_Id
+)
+SELECT 
+    User_Id, 
+    total_loyalty_points,
+    (total_loyalty_points / (SELECT SUM(total_loyalty_points) FROM ranked_players WHERE rank <= 50)) * 50000 AS bonus
+FROM 
+    ranked_players
+WHERE 
+    rank <= 50;
